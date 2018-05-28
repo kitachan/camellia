@@ -6,24 +6,38 @@ from keras.layers import Flatten
 from keras.layers import Dense
 
 #Stage 1 - Preparing CNN
+
 # Initialize CNN
 classifier = Sequential()
+
 # Step 1 - Convolution
-classifier.add(Conv2D(32, (3, 3), input_shape = (64,64, 3), activation = 'relu')) 
+classifier.add(Conv2D(32, (3, 3), input_shape = (64,64, 3), activation = 'relu'))
+
 # Step 2 - Pooling
 classifier.add(MaxPooling2D(pool_size = (2, 2)))
+
 # Adding a second convolutional layer
 classifier.add(Conv2D(32, (3, 3), activation = 'relu'))
 classifier.add(MaxPooling2D(pool_size = (2, 2)))
+
 # Step 3 - Flattening
 classifier.add(Flatten())
+
 # Step 4 - Full connection
 classifier.add(Dense(units = 128, activation = 'relu'))
 classifier.add(Dense(units = 1, activation = 'sigmoid'))
+
 # Compilation of CNN
 classifier.compile(optimizer = 'adam', loss = 'binary_crossentropy', metrics = ['accuracy'])
 classifier.summary()
+
+#Comment out when loading model
+
 classifier.save('camweight.h5')
+
+#Comment out when running CNN for the first time
+
+#classifier.load_weights('camweight.h5')
 
 #Stage 2 - adding images to CNN
 from keras.preprocessing.image import ImageDataGenerator
@@ -45,15 +59,18 @@ test_dataset = test_datagen.flow_from_directory(
                                                         target_size = (64,64),
                                                         batch_size = 32,
                                                         class_mode = 'binary')
+
+
+#Comment out when attempting prediction
+
 classifier.fit_generator(training_dataset,
                         steps_per_epoch = 800,
                         epochs = 25,
-                        validation_data = test_dataset,
+                       validation_data = test_dataset,
                         validation_steps = 400)
 
 
-
-#Stage 3 - Make new prediction(test)
+#Stage 3 - Make new prediction
 import numpy as np
 from keras.preprocessing import image
 test_image = image.load_img('data/prediction/camellia_or_other.jpg', target_size = (64, 64))
@@ -65,3 +82,5 @@ if result[0][0] == 1:
     prediction = 'other'
 else:
     prediction = 'camellia'
+
+print("This is a: ", prediction)
